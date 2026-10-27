@@ -225,6 +225,7 @@ struct State : InputContextProperty {
   bool doubleQuoteLeft = true, singleQuoteLeft = true;
   bool english = false, fullWidth = false, traditional = false,
        englishPunctuation = false, vMode = false, vCalculator = false;
+  bool languageInitialized = false;
   bool selectionPending = false;
   std::vector<DeferredKey> deferredKeys;
   VMenu vMenu = VMenu::None;
@@ -2093,9 +2094,12 @@ public:
       return;
     }
     current->active = true;
-    current->english = *config_.input->defaultLanguage ==
-                       wetype_config::DefaultLanguage::English;
-    current->traditional = false;
+    // activate() runs on every focus-in; seed language state only once.
+    if (!current->languageInitialized) {
+      current->english = *config_.input->defaultLanguage ==
+                         wetype_config::DefaultLanguage::English;
+      current->languageInitialized = true;
+    }
     ic->statusArea().addAction(StatusGroup::InputMethod, &settingsAction_);
     if (ic->capabilityFlags().test(CapabilityFlag::Password))
       return;
