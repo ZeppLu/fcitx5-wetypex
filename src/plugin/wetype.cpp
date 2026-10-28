@@ -1562,6 +1562,7 @@ class WeType : public InputMethodEngine {
         s->seq = s->applied = s->inputSeq = 0;
         s->selectionPending = false;
         s->deferredKeys.clear();
+        s->modifierCandidate = FcitxKey_None;
         s->preedit.clear();
         s->cursor = 0;
         clearDisplayState(s);
@@ -2118,6 +2119,9 @@ public:
     clearVMenu(s);
     s->selectionPending = false;
     s->deferredKeys.clear();
+    // A modifier press belongs to the current focus/composition lifetime.
+    // Its release after a focus round trip must not toggle the saved language.
+    s->modifierCandidate = FcitxKey_None;
     ++s->epoch;
     s->preedit.clear();
     s->cursor = 0;
